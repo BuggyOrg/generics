@@ -1,0 +1,33 @@
+{
+  "name": "@buggyorg/generics",
+  "version": "0.1.0",
+  "description": "Determines all generic types in a buggy graph.",
+  "main": "lib/api.js",
+  "scripts": {
+    "pretest": "find test/fixtures -maxdepth 1 -iname \"*.clj\" -exec sh -c 'for i do lisgy parse -r \"$i\" > \"${i%.*}.json\"; done' sh {} +",
+    "test": "standard src/**/*.js && mocha --compilers js:babel-register",
+    "run-mocha": "mocha --compilers js:babel-register || echo ''",
+    "build": "babel src -d lib",
+    "prepublish": "babel src -d lib"
+  },
+  "author": "Maximilian Klein",
+  "license": "MIT",
+  "devDependencies": {
+    "@buggyorg/lisgy": "^0.1.0",
+    "babel-cli": "^6.6.5",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-register": "^6.3.13",
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "standard": "^6.0.8"
+  },
+  "dependencies": {
+    "graphlib": "^2.1.0",
+    "lodash": "^4.8.2"
+  },
+  "standard": {
+    "ignore": [
+      "/src/const-rewrite.bundle.js"
+    ]
+  }
+}
