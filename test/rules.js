@@ -52,6 +52,13 @@ describe('Rewriting rules', () => {
     expect(preGeneric.node('equal_0').inputPorts.i1).to.equal('number')
     expect(preGeneric.node('equal_0').inputPorts.i2).to.equal('number')
   })
+  
+  it('sets port types of a generic compound node', () => {
+    var preGeneric = readFixture('preGenericCompound.json')
+    rules.predecessorPropagatesType(preGeneric)
+    rules.genericTypes(preGeneric)
+    expect(preGeneric.node('genIn_1').inputPorts['x']).to.equal('number')
+  })
 
   it('uses type references to determine types', () => {
     var preGeneric = readFixture('typeRef.json')

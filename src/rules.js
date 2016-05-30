@@ -65,5 +65,7 @@ export const typeReferences = rewrite.rule(
 
 export default [
   predecessorPropagatesType,
-  successorPropagatesType
+  successorPropagatesType,
+  genericTypes,
+  typeReferences
 ]

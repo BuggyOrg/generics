@@ -3,11 +3,11 @@ import {utils} from '@buggyorg/graphtools'
 import _ from 'lodash'
 
 export function isGenericType (type) {
-  return type.indexOf('generic') !== -1
+  return typeof (type) !== 'object' && type.indexOf('generic') !== -1
 }
 
 export function isTypeRef (type) {
-  return type.type === 'type-ref'
+  return typeof (type) === 'object' && type.type === 'type-ref'
 }
 
 export function isActiveTypeRef (graph, type) {
@@ -35,4 +35,34 @@ export function tangleType (type, template) {
   } else {
     return type
   }
+}
+
+export function genericNodes (graph) {
+  var nodes = graph.nodes()
+  var genNodes = []
+  for (let i = 0; i < nodes.length; i++) {
+    var inp = graph.node(nodes[i]).inputPorts
+    if (inp !== undefined) {
+      var inpKeys = Object.keys(inp)
+      for (let j = 0; j < inpKeys.length; j++) {
+        if (isGenericType(inp[inpKeys[j]])) {
+          genNodes.push(nodes[i])
+        }
+      }
+    }
+    var outp = graph.node(nodes[i]).outputPorts
+    if (outp !== undefined) {
+      var outpKeys = Object.keys(outp)
+      for (let j = 0; j < outpKeys.length; j++) {
+        if (isGenericType(outp[outpKeys[j]])) {
+          genNodes.push(nodes[i])
+        }
+      }
+    }
+  }
+  return genNodes
+}
+
+export function isGenericFree (graph) {
+  return genericNodes(graph).length === 0
 }

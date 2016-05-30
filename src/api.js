@@ -9,5 +9,8 @@ function applyGenericRules (graph) {
 }
 
 export function replaceGenerics (graph) {
-  return applyGenericRules(graph)
+  for (var n = 0; n < graph.nodes().length; n++) {
+    graph = applyGenericRules(graph)
+  }
+  return graph
 }

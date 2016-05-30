@@ -19,7 +19,7 @@ export function genericInput (graph, n) {
     return false
   }
   var predecessor = _.first(walk.predecessor(graph, n, genericPort))
-  if (isGenericType(utils.portType(graph, predecessor.node, predecessor.port))) {
+  if (!predecessor || isGenericType(utils.portType(graph, predecessor.node, predecessor.port))) {
     return false
   }
   return { port: genericPort, predecessor }
@@ -33,7 +33,7 @@ export function genericOutput (graph, n) {
     return false
   }
   var successor = _.first(walk.successor(graph, n, genericPort))
-  if (isGenericType(utils.portType(graph, successor.node, successor.port))) {
+  if (!successor || isGenericType(utils.portType(graph, successor.node, successor.port))) {
     return false
   }
   return { port: genericPort, successor }
