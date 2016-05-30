@@ -1,0 +1,87 @@
+{
+  "options": {
+    "directed": true,
+    "multigraph": true,
+    "compound": true
+  },
+  "nodes": [
+    {
+      "v": "equal_0",
+      "value": {
+        "name": "equal_0",
+        "id": "logic/equal",
+        "inputPorts": {
+          "i1": { "type": "type-ref", "reference": { "node": "const(3)_1", "port": "output" } },
+          "i2": "generic"
+        },
+        "outputPorts": {
+          "eq": "bool"
+        },
+        "atomic": true,
+        "version": "0.1.0",
+        "path": [],
+        "branchPath": "equal_0",
+        "branch": "equal_0",
+        "recursive": false
+      }
+    },
+    {
+      "v": "const(3)_1",
+      "value": {
+        "id": "math/const",
+        "version": "0.2.0",
+        "inputPorts": {},
+        "outputPorts": {
+          "output": "number"
+        },
+        "atomic": true,
+        "path": [],
+        "params": {
+          "value": 3
+        },
+        "branchPath": "const(3)_1",
+        "branch": "const(3)_1",
+        "name": "const(3)_1",
+        "recursive": false
+      }
+    },
+    {
+      "v": "const(1)_2",
+      "value": {
+        "id": "math/const",
+        "version": "0.2.0",
+        "inputPorts": {},
+        "outputPorts": {
+          "output": "number"
+        },
+        "atomic": true,
+        "path": [],
+        "params": {
+          "value": 1
+        },
+        "branchPath": "const(1)_2",
+        "branch": "const(1)_2",
+        "name": "const(1)_2",
+        "recursive": false
+      }
+    }
+  ],
+  "edges": [
+    {
+      "v": "const(3)_1",
+      "w": "equal_0",
+      "value": {
+        "outPort": "output",
+        "inPort": "i1"
+      }
+    },
+    {
+      "v": "const(1)_2",
+      "w": "equal_0",
+      "value": {
+        "outPort": "output",
+        "inPort": "i2"
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 
 import {walk, utils} from '@buggyorg/graphtools'
-import {isGenericType} from './utils'
+import {isGenericType, isActiveTypeRef} from './utils'
 import _ from 'lodash'
 
 var genericInputPort = (node) => {
@@ -37,4 +37,26 @@ export function genericOutput (graph, n) {
     return false
   }
   return { port: genericPort, successor }
+}
+
+export function genericType (graph, n) {
+  const node = graph.node(n)
+
+  // don't process non generics
+  if (!node.settings || !node.settings.isGeneric) {
+    return false
+  }
+  // if all output ports were already assigned do not process this
+  if (!genericInputPort(node) && !genericOutputPort(node)) {
+    return false
+  }
+  return true
+}
+
+export function activeTypeRefs (graph, n) {
+  return _(utils.ports(graph, n))
+    .toPairs()
+    .filter((p) => isActiveTypeRef(graph, p[1]))
+    .fromPairs()
+    .value()
 }

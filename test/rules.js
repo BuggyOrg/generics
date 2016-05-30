@@ -25,8 +25,8 @@ describe('Rewriting rules', () => {
     var preGeneric = readFixture('preGenericCompound.json')
     rules.predecessorPropagatesType(preGeneric)
     expect(preGeneric.node('genIn_1')).to.have.property('settings')
-    expect(preGeneric.node('genIn_1').settings.genericType).to.be.an('array')
-    expect(preGeneric.node('genIn_1').settings.genericType[0]).to.eql({port: 'x', type: 'number'})
+    expect(preGeneric.node('genIn_1').settings.genericType).to.be.an('object')
+    expect(preGeneric.node('genIn_1').settings.genericType['x']).to.equal('number')
   })
 
   it('sets generic type via output ports', () => {
@@ -41,8 +41,22 @@ describe('Rewriting rules', () => {
     var postGeneric = readFixture('postGenericCompound.json')
     rules.successorPropagatesType(postGeneric)
     expect(postGeneric.node('genOut_4')).to.have.property('settings')
-    expect(postGeneric.node('genOut_4').settings.genericType).to.be.an('array')
-    expect(postGeneric.node('genOut_4').settings.genericType[0].type).to.equal('number')
+    expect(postGeneric.node('genOut_4').settings.genericType).to.be.an('object')
+    expect(postGeneric.node('genOut_4').settings.genericType['value']).to.equal('number')
+  })
+
+  it('sets port types of a generic node', () => {
+    var preGeneric = readFixture('preGeneric.json')
+    rules.predecessorPropagatesType(preGeneric)
+    rules.genericTypes(preGeneric)
+    expect(preGeneric.node('equal_0').inputPorts.i1).to.equal('number')
+    expect(preGeneric.node('equal_0').inputPorts.i2).to.equal('number')
+  })
+
+  it('uses type references to determine types', () => {
+    var preGeneric = readFixture('typeRef.json')
+    rules.typeReferences(preGeneric)
+    expect(preGeneric.node('equal_0').inputPorts.i1).to.equal('number')
   })
 })
 
