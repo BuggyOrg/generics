@@ -4,7 +4,7 @@ import rules from './rules'
 
 function applyGenericRules (graph) {
   var newGraph = utils.clone(graph)
-  rules.forEach(f => f(newGraph))
+  rules.forEach((f) => f(newGraph))
   return newGraph
 }
 

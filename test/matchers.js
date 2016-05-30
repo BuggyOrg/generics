@@ -15,6 +15,11 @@ var readFixture = (file) => {
 describe('Matches nodes for generic processing', () => {
   it('matches nodes with generic inputs', () => {
     var preGeneric = readFixture('preGeneric.json')
-    expect(matchers.genericInput(preGeneric, 'genIn_1').port).to.equal('x')
+    expect(matchers.genericInput(preGeneric, 'equal_0').port).to.be.oneOf(['i1', 'i2'])
+  })
+
+  it('matches nodes with generic outputs', () => {
+    var postGeneric = readFixture('postGeneric.json')
+    expect(matchers.genericOutput(postGeneric, 'join_1').port).to.equal('to')
   })
 })

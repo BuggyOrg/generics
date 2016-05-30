@@ -18,11 +18,5 @@ describe('Determine generic types', () => {
     var replaced = replaceGenerics(nonGeneric)
     expect(graphlib.json.write(nonGeneric)).to.eql(graphlib.json.write(replaced))
   })
-
-  it('replaces generic inputs with their predecessors', () => {
-    var preGeneric = readFixture('preGeneric.json')
-    var replaced = replaceGenerics(preGeneric)
-    expect(replaced.node('genIn_1').inputPorts['x']).to.equal('number')
-  })
 })
 

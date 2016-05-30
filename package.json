@@ -6,7 +6,7 @@
   "scripts": {
     "pretest": "find test/fixtures -maxdepth 1 -iname \"*.clj\" -exec sh -c 'for i do lisgy parse -r \"$i\" > \"${i%.*}.json\"; done' sh {} +",
     "test": "standard src/**/*.js && mocha --compilers js:babel-register",
-    "run-mocha": "mocha --compilers js:babel-register || echo ''",
+    "run-mocha": "standard src/**/*.js && mocha --compilers js:babel-register || echo ''",
     "build": "babel src -d lib",
     "prepublish": "babel src -d lib"
   },
