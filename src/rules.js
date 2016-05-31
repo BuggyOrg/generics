@@ -43,13 +43,13 @@ export const genericTypes = rewrite.rule(
     if (curNode.atomic) {
       _.each(utils.ports(graph, n), (portType, p) => {
         if (isGenericType(portType)) {
-          utils.setPortType(graph, n, p, entangleType(gType, portType))
+          utils.setPortType(graph, n, p, tangleType(gType, portType))
         }
       })
     } else {
       _.each(utils.ports(graph, n), (portType, p) => {
         if (isGenericType(portType) && _.has(gType, p)) {
-          utils.setPortType(graph, n, p, entangleType(gType[p], portType))
+          utils.setPortType(graph, n, p, tangleType(gType[p], portType))
         }
       })
     }
@@ -100,6 +100,8 @@ export const typeReferences = rewrite.rule(
     _.each(match, (typeRef, port) => {
       var typeRefType = utils.portType(graph, typeRef.node, typeRef.port)
       utils.setPortType(graph, n, port, tangleType(typeRefType, typeRef.template))
+      graph.node(n).settings = graph.node(n).settings || {}
+      graph.node(n).settings.isGeneric = true
     })
   }
 )
@@ -110,6 +112,8 @@ export const functionReferences = rewrite.rule(
     try {
       replaceFunctionPorts(graph, graph.node(n), 'inputPorts')
       replaceFunctionPorts(graph, graph.node(n), 'outputPorts')
+      graph.node(n).settings = graph.node(n).settings || {}
+      graph.node(n).settings.isGeneric = true
     } catch (err) {
       var jsonTmp = tempfile('.json')
       fs.writeFileSync(jsonTmp, JSON.stringify(graphlib.json.write(graph)))
