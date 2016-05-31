@@ -10,9 +10,30 @@ export function isTypeRef (type) {
   return typeof (type) === 'object' && type.type === 'type-ref'
 }
 
+export function isFunction (type) {
+  return typeof (type) === 'object' && type.type === 'function'
+}
+
+export function hasTypeRefKeys (graph, obj) {
+  return _.reduce(obj, (acc, value, key) => {
+    return acc || hasTypeReferences(graph, value)
+  }, false)
+}
+
+export function hasTypeReferences (graph, type) {
+  return isActiveTypeRef(graph, type) ||
+    isFunction(type) && (
+      hasTypeRefKeys(graph, type.arguments) ||
+      hasTypeRefKeys(graph, type.outputs))
+}
+
+export function isFunctionReference (graph, type) {
+  return isFunction(type) && hasTypeReferences(graph, type)
+}
+
 export function isActiveTypeRef (graph, type) {
   return isTypeRef(type) &&
-    !isGenericType(utils.portType(graph, type.reference.node, type.reference.port))
+    !isGenericType(utils.portType(graph, type.node, type.port))
 }
 
 export function entangleType (type, template) {

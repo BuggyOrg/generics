@@ -2,7 +2,7 @@
 import {rewrite} from './const-rewrite.bundle.js'
 import * as matchers from './matchers'
 import {utils} from '@buggyorg/graphtools'
-import {isGenericType, tangleType, entangleType} from './utils'
+import {isGenericType, tangleType, entangleType, isFunction, isTypeRef} from './utils'
 import _ from 'lodash'
 
 const matchNonGenericNeighbor = (graph, node, match, matchType) => {
@@ -45,7 +45,7 @@ export const genericTypes = rewrite.rule(
       })
     } else {
       _.each(utils.ports(graph, n), (portType, p) => {
-        if (isGenericType(portType)) {
+        if (isGenericType(portType) && _.has(gType, p)) {
           utils.setPortType(graph, n, p, tangleType(gType[p], portType))
         }
       })
@@ -53,13 +53,53 @@ export const genericTypes = rewrite.rule(
   }
 )
 
+function replaceFunctionPorts (graph, node, portType) {
+  node[portType] = _.mapValues(node[portType], (type, key) => {
+    if (isFunction(type)) {
+      return replaceFunctionTypeReferences(graph, type)
+    }
+    return type
+  })
+  graph.setNode(node.branchPath, _.cloneDeep(node))
+}
+
+function replaceFunctionTypeReferences (graph, functionType) {
+  var resTypeRefs = _.partial(resolveTypeReference, graph)
+  return {
+    type: 'function',
+    arguments: _.mapValues(functionType.arguments, resTypeRefs),
+    outputs: _.mapValues(functionType.outputs, resTypeRefs),
+    return: resTypeRefs(functionType.return)
+  }
+}
+
+function resolveTypeReference (graph, typeRef) {
+  if (isTypeRef(typeRef)) {
+    return resolveTypeReference(graph, graph.node(typeRef.node)[utils.portDirectionType(graph, typeRef.node, typeRef.port)][typeRef.port])
+  } else if (isFunction(typeRef)) {
+    return replaceFunctionTypeReferences(graph, typeRef)
+  } else {
+    return typeRef
+  }
+}
+
 export const typeReferences = rewrite.rule(
   matchers.activeTypeRefs,
   (graph, n, match) => {
     _.each(match, (typeRef, port) => {
-      var typeRefType = utils.portType(graph, typeRef.reference.node, typeRef.reference.port)
+      var typeRefType = utils.portType(graph, typeRef.node, typeRef.port)
       utils.setPortType(graph, n, port, typeRefType)
+      replaceFunctionPorts(graph, graph.node(n), 'inputPorts')
+      replaceFunctionPorts(graph, graph.node(n), 'outputPorts')
     })
+  }
+)
+
+export const functionReferences = rewrite.rule(
+  matchers.functionReferences,
+  (graph, n, match) => {
+    replaceFunctionPorts(graph, graph.node(n), 'inputPorts')
+    replaceFunctionPorts(graph, graph.node(n), 'outputPorts')
   }
 )
 
@@ -67,5 +107,6 @@ export default [
   predecessorPropagatesType,
   successorPropagatesType,
   genericTypes,
-  typeReferences
+  typeReferences,
+  functionReferences
 ]

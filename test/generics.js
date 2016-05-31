@@ -23,8 +23,6 @@ describe('Determine generic types', () => {
   it.only('can process the recursive map example', () => {
     var mapGraph = readFixture('fullGraphs/map.json')
     var replaced = replaceGenerics(mapGraph)
-    console.log(genericNodes(replaced))
-    console.log(JSON.stringify(graphlib.json.write(replaced)))
     expect(genericNodes(replaced)).to.be.empty
   })
 })

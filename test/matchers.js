@@ -18,6 +18,11 @@ describe('Matches nodes for generic processing', () => {
     expect(matchers.genericInput(preGeneric, 'equal_0').port).to.be.oneOf(['i1', 'i2'])
   })
 
+  it('matches compound nodes with generic inport going into the sub graph', () => {
+    var preGeneric = readFixture('postGenericCompound.json')
+    expect(matchers.genericInput(preGeneric, 'genOut_4').port).to.equal('value')
+  })
+
   it('matches nodes with generic outputs', () => {
     var postGeneric = readFixture('postGeneric.json')
     expect(matchers.genericOutput(postGeneric, 'join_1').port).to.equal('to')

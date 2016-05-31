@@ -24,9 +24,9 @@ describe('Rewriting rules', () => {
   it('sets generic type via input ports for a compound node', () => {
     var preGeneric = readFixture('preGenericCompound.json')
     rules.predecessorPropagatesType(preGeneric)
-    expect(preGeneric.node('genIn_1')).to.have.property('settings')
-    expect(preGeneric.node('genIn_1').settings.genericType).to.be.an('object')
-    expect(preGeneric.node('genIn_1').settings.genericType['x']).to.equal('number')
+    expect(preGeneric.node('genIn_2')).to.have.property('settings')
+    expect(preGeneric.node('genIn_2').settings.genericType).to.be.an('object')
+    expect(preGeneric.node('genIn_2').settings.genericType['x']).to.equal('number')
   })
 
   it('sets generic type via output ports', () => {
@@ -52,12 +52,12 @@ describe('Rewriting rules', () => {
     expect(preGeneric.node('equal_0').inputPorts.i1).to.equal('number')
     expect(preGeneric.node('equal_0').inputPorts.i2).to.equal('number')
   })
-  
+
   it('sets port types of a generic compound node', () => {
     var preGeneric = readFixture('preGenericCompound.json')
     rules.predecessorPropagatesType(preGeneric)
     rules.genericTypes(preGeneric)
-    expect(preGeneric.node('genIn_1').inputPorts['x']).to.equal('number')
+    expect(preGeneric.node('genIn_2').inputPorts['x']).to.equal('number')
   })
 
   it('uses type references to determine types', () => {
