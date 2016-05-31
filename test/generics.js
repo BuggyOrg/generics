@@ -20,7 +20,7 @@ describe('Determine generic types', () => {
     expect(graphlib.json.write(nonGeneric)).to.eql(graphlib.json.write(replaced))
   })
 
-  it.only('can process the recursive map example', () => {
+  it('can process the recursive map example', () => {
     var mapGraph = readFixture('fullGraphs/map.json')
     var replaced = replaceGenerics(mapGraph)
     expect(genericNodes(replaced)).to.be.empty

@@ -4,6 +4,9 @@ import * as matchers from './matchers'
 import {utils} from '@buggyorg/graphtools'
 import {isGenericType, tangleType, entangleType, isFunction, isTypeRef} from './utils'
 import _ from 'lodash'
+import fs from 'fs'
+import graphlib from 'graphlib'
+import tempfile from 'tempfile'
 
 const matchNonGenericNeighbor = (graph, node, match, matchType) => {
   var curNode = graph.node(node)
@@ -78,6 +81,8 @@ function resolveTypeReference (graph, typeRef) {
     return resolveTypeReference(graph, graph.node(typeRef.node)[utils.portDirectionType(graph, typeRef.node, typeRef.port)][typeRef.port])
   } else if (isFunction(typeRef)) {
     return replaceFunctionTypeReferences(graph, typeRef)
+  } else if (isGenericType(typeRef)) {
+    throw new Error('Cannot apply type replacement on generic type.')
   } else {
     return typeRef
   }
@@ -89,8 +94,6 @@ export const typeReferences = rewrite.rule(
     _.each(match, (typeRef, port) => {
       var typeRefType = utils.portType(graph, typeRef.node, typeRef.port)
       utils.setPortType(graph, n, port, typeRefType)
-      replaceFunctionPorts(graph, graph.node(n), 'inputPorts')
-      replaceFunctionPorts(graph, graph.node(n), 'outputPorts')
     })
   }
 )
@@ -98,8 +101,14 @@ export const typeReferences = rewrite.rule(
 export const functionReferences = rewrite.rule(
   matchers.functionReferences,
   (graph, n, match) => {
-    replaceFunctionPorts(graph, graph.node(n), 'inputPorts')
-    replaceFunctionPorts(graph, graph.node(n), 'outputPorts')
+    try {
+      replaceFunctionPorts(graph, graph.node(n), 'inputPorts')
+      replaceFunctionPorts(graph, graph.node(n), 'outputPorts')
+    } catch (err) {
+      var jsonTmp = tempfile('.json')
+      fs.writeFileSync(jsonTmp, JSON.stringify(graphlib.json.write(graph)))
+      throw new Error('Unable to apply function reference on node ' + n + ' to match \n' + JSON.stringify(match, null, 2))
+    }
   }
 )
 

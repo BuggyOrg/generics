@@ -36,5 +36,57 @@ describe('Generic utility functions', () => {
     expect(utils.isActiveTypeRef(preGeneric, {type: 'type-ref', node: 'equal_0', port: 'eq'})).to.be.true
     expect(utils.isActiveTypeRef(preGeneric, {type: 'type-ref', node: 'equal_0', port: 'i1'})).to.be.false
   })
+
+  it('detects active function references correctly', () => {
+    var preGeneric = readFixture('preGeneric.json')
+    expect(utils.isFunctionReference(preGeneric,
+      {
+        type: 'function',
+        arguments: {
+          a: {type: 'type-ref', node: 'equal_0', port: 'eq'}
+        },
+        outputs: {
+          b: 'number'
+        },
+        return: 'number'
+      })).to.be.true
+    expect(utils.isFunctionReference(preGeneric,
+      {
+        type: 'function',
+        arguments: {
+          a: 'string'
+        },
+        outputs: {
+          b: {type: 'type-ref', node: 'equal_0', port: 'eq'}
+        },
+        return: {type: 'type-ref', node: 'equal_0', port: 'eq'}
+      })).to.be.true
+  })
+
+  it('detects inactive function references correctly', () => {
+    var preGeneric = readFixture('preGeneric.json')
+    expect(utils.isFunctionReference(preGeneric,
+      {
+        type: 'function',
+        arguments: {
+          a: {type: 'type-ref', node: 'equal_0', port: 'i1'}
+        },
+        outputs: {
+          b: 'number'
+        },
+        return: 'number'
+      })).to.be.false
+    expect(utils.isFunctionReference(preGeneric,
+      {
+        type: 'function',
+        arguments: {
+          a: {type: 'type-ref', node: 'equal_0', port: 'eq'}
+        },
+        outputs: {
+          b: {type: 'type-ref', node: 'equal_0', port: 'i1'}
+        },
+        return: {type: 'type-ref', node: 'equal_0', port: 'i1'}
+      })).to.be.false
+  })
 })
 

@@ -14,21 +14,21 @@ export function isFunction (type) {
   return typeof (type) === 'object' && type.type === 'function'
 }
 
-export function hasTypeRefKeys (graph, obj) {
+export function hasInactiveTypeRefKeys (graph, obj) {
   return _.reduce(obj, (acc, value, key) => {
-    return acc || hasTypeReferences(graph, value)
+    return acc || hasInactiveTypeReferences(graph, value)
   }, false)
 }
 
-export function hasTypeReferences (graph, type) {
-  return isActiveTypeRef(graph, type) ||
-    isFunction(type) && (
-      hasTypeRefKeys(graph, type.arguments) ||
-      hasTypeRefKeys(graph, type.outputs))
+export function hasInactiveTypeReferences (graph, type) {
+  return (isTypeRef(type) && !isActiveTypeRef(graph, type)) ||
+    (isFunction(type) && (
+      hasInactiveTypeRefKeys(graph, type.arguments) ||
+      hasInactiveTypeRefKeys(graph, type.outputs)))
 }
 
 export function isFunctionReference (graph, type) {
-  return isFunction(type) && hasTypeReferences(graph, type)
+  return isFunction(type) && !hasInactiveTypeReferences(graph, type)
 }
 
 export function isActiveTypeRef (graph, type) {
