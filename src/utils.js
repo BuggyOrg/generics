@@ -27,13 +27,30 @@ export function hasInactiveTypeReferences (graph, type) {
       hasInactiveTypeRefKeys(graph, type.outputs)))
 }
 
+export function hasTypeRefKeys (graph, obj) {
+  return _.reduce(obj, (acc, value, key) => {
+    return acc || hasTypeReferences(graph, value)
+  }, false)
+}
+
+export function hasTypeReferences (graph, type) {
+  return (isTypeRef(type) && isActiveTypeRef(graph, type)) ||
+    (isFunction(type) && (
+      hasTypeRefKeys(graph, type.arguments) ||
+      hasTypeRefKeys(graph, type.outputs)))
+}
+
 export function isFunctionReference (graph, type) {
-  return isFunction(type) && !hasInactiveTypeReferences(graph, type)
+  return isFunction(type) && hasTypeReferences(graph, type) && !hasInactiveTypeReferences(graph, type)
 }
 
 export function isActiveTypeRef (graph, type) {
-  return isTypeRef(type) &&
-    !isGenericType(utils.portType(graph, type.node, type.port))
+  if (!isTypeRef(type)) {
+    return false
+  }
+  var portType = utils.portType(graph, type.node, type.port)
+  return (isTypeRef(portType) && isActiveTypeRef(portType)) ||
+    (!isTypeRef(portType) && !isGenericType(portType))
 }
 
 export function entangleType (type, template) {
@@ -48,7 +65,7 @@ export function entangleType (type, template) {
 }
 
 export function tangleType (type, template) {
-  if (template[0] === '[' && template[template.length - 1] === ']') {
+  if (template && template[0] === '[' && template[template.length - 1] === ']') {
     if (typeof (type) === 'object' && type.type === 'type-ref') {
       return _.merge({}, type, {template})
     }

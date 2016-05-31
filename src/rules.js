@@ -43,13 +43,13 @@ export const genericTypes = rewrite.rule(
     if (curNode.atomic) {
       _.each(utils.ports(graph, n), (portType, p) => {
         if (isGenericType(portType)) {
-          utils.setPortType(graph, n, p, tangleType(gType, portType))
+          utils.setPortType(graph, n, p, entangleType(gType, portType))
         }
       })
     } else {
       _.each(utils.ports(graph, n), (portType, p) => {
         if (isGenericType(portType) && _.has(gType, p)) {
-          utils.setPortType(graph, n, p, tangleType(gType[p], portType))
+          utils.setPortType(graph, n, p, entangleType(gType[p], portType))
         }
       })
     }
@@ -78,11 +78,17 @@ function replaceFunctionTypeReferences (graph, functionType) {
 
 function resolveTypeReference (graph, typeRef) {
   if (isTypeRef(typeRef)) {
-    return resolveTypeReference(graph, graph.node(typeRef.node)[utils.portDirectionType(graph, typeRef.node, typeRef.port)][typeRef.port])
+    try {
+      return resolveTypeReference(graph, tangleType(
+        graph.node(typeRef.node)[utils.portDirectionType(graph, typeRef.node, typeRef.port)][typeRef.port],
+        typeRef.template))
+    } catch (err) {
+      throw new Error(err + '\n  As type reference in: ' + JSON.stringify(typeRef))
+    }
   } else if (isFunction(typeRef)) {
     return replaceFunctionTypeReferences(graph, typeRef)
   } else if (isGenericType(typeRef)) {
-    throw new Error('Cannot apply type replacement on generic type.')
+    throw new Error('Cannot apply type replacement on generic type' + JSON.stringify(typeRef) + '.')
   } else {
     return typeRef
   }
@@ -93,7 +99,7 @@ export const typeReferences = rewrite.rule(
   (graph, n, match) => {
     _.each(match, (typeRef, port) => {
       var typeRefType = utils.portType(graph, typeRef.node, typeRef.port)
-      utils.setPortType(graph, n, port, typeRefType)
+      utils.setPortType(graph, n, port, tangleType(typeRefType, typeRef.template))
     })
   }
 )
@@ -107,7 +113,7 @@ export const functionReferences = rewrite.rule(
     } catch (err) {
       var jsonTmp = tempfile('.json')
       fs.writeFileSync(jsonTmp, JSON.stringify(graphlib.json.write(graph)))
-      throw new Error('Unable to apply function reference on node ' + n + ' to match \n' + JSON.stringify(match, null, 2))
+      throw new Error('Unable to apply function reference on node ' + n + ' to match \n' + JSON.stringify(match, null, 2) + '\n' + err + '\nwrote graph to ' + jsonTmp)
     }
   }
 )

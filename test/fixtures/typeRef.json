@@ -11,7 +11,7 @@
         "name": "equal_0",
         "id": "logic/equal",
         "inputPorts": {
-          "i1": { "type": "type-ref", "reference": { "node": "const(3)_1", "port": "output" } },
+          "i1": { "type": "type-ref", "node": "const(3)_1", "port": "output" },
           "i2": "generic"
         },
         "outputPorts": {
