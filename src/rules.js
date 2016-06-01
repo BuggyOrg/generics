@@ -122,10 +122,20 @@ export const functionReferences = rewrite.rule(
   }
 )
 
+export const recursivePorts = rewrite.rule(
+  matchers.recursiveCompound,
+  (graph, n, match) => {
+    _.each(match.ports, (p) => {
+      utils.setPortType(graph, n, p, utils.portType(graph, match.node, p))
+    })
+  }
+)
+
 export default [
   predecessorPropagatesType,
   successorPropagatesType,
   genericTypes,
   typeReferences,
-  functionReferences
+  functionReferences,
+  recursivePorts
 ]

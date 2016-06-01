@@ -56,6 +56,30 @@ export function genericOutput (graph, n) {
   return successor
 }
 
+export function recursiveCompound (graph, n) {
+  const node = graph.node(n)
+
+  // this only works for recursive compounds
+  if (node.atomic || !node.recursive || !node.recursesTo) {
+    return false
+  }
+
+  // only when there is a generic port ;)
+  var genericPorts = _.concat(genericInputPort(node))
+  if (genericPorts.length === 0) {
+    return false
+  }
+
+  var recNode = graph.node(node.recursesTo.branchPath)
+  var recGenPorts = _.concat(genericInputPort(recNode))
+  var newPorts = _.difference(genericPorts, recGenPorts)
+  if (newPorts.length > 0) {
+    return { node: node.recursesTo.branchPath, ports: newPorts }
+  } else {
+    return false
+  }
+}
+
 export function genericType (graph, n) {
   const node = graph.node(n)
 
