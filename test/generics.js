@@ -25,5 +25,11 @@ describe('Determine generic types', () => {
     var replaced = replaceGenerics(mapGraph)
     expect(genericNodes(replaced)).to.be.empty
   })
+
+  it('can process the recursive map example', () => {
+    var selGraph = readFixture('fullGraphs/selectionsort.json')
+    var replaced = replaceGenerics(selGraph)
+    expect(genericNodes(replaced)).to.be.empty
+  })
 })
 
