@@ -55,7 +55,7 @@ export const genericTypes = rewrite.rule(
     }
   }
 )
-
+/*
 function replaceFunctionPorts (graph, node, portType) {
   node[portType] = _.mapValues(node[portType], (type, key) => {
     if (isFunction(type)) {
@@ -64,7 +64,7 @@ function replaceFunctionPorts (graph, node, portType) {
     return type
   })
   graph.setNode(node.branchPath, _.cloneDeep(node))
-}
+}*/
 
 function replaceFunctionTypeReferences (graph, functionType) {
   var resTypeRefs = _.partial(resolveTypeReference, graph)
@@ -110,14 +110,15 @@ export const functionReferences = rewrite.rule(
   matchers.functionReferences,
   (graph, n, match) => {
     try {
-      replaceFunctionPorts(graph, graph.node(n), 'inputPorts')
-      replaceFunctionPorts(graph, graph.node(n), 'outputPorts')
+      _.each(match, (type, key) => {
+        utils.setPortType(graph, n, key, replaceFunctionTypeReferences(graph, type))
+      })
       graph.node(n).settings = graph.node(n).settings || {}
       graph.node(n).settings.isGeneric = true
     } catch (err) {
       var jsonTmp = tempfile('.json')
       fs.writeFileSync(jsonTmp, JSON.stringify(graphlib.json.write(graph)))
-      throw new Error('Unable to apply function reference on node ' + n + ' to match \n' + JSON.stringify(match, null, 2) + '\n' + err + '\nwrote graph to ' + jsonTmp)
+      throw new Error('Unable to apply function reference on node ' + n + ' to match \n' + JSON.stringify(match, null, 2) + '\n' + err.stack + '\nwrote graph to ' + jsonTmp)
     }
   }
 )
