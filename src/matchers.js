@@ -1,6 +1,6 @@
 
 import {walk, utils} from '@buggyorg/graphtools'
-import {isGenericType, isActiveTypeRef, isFunctionReference} from './utils'
+import {isGenericType, isActiveTypeRef, isFunctionReference, isTypeRef} from './utils'
 import _ from 'lodash'
 
 var genericInputPort = (node) => {
@@ -11,11 +11,27 @@ var genericInputPort = (node) => {
   }
 }
 
+var typeRefInputPort = (graph, node) => {
+  if (node.atomic) {
+    return _.keys(_.pickBy(node.inputPorts, (type, name) => isTypeRef(type) && !isActiveTypeRef(graph, type)))
+  } else {
+    return _.keys(_.pickBy(_.merge({}, node.inputPorts, node.outputPorts), (type, name) => isTypeRef(type) && !isActiveTypeRef(graph, type)))
+  }
+}
+
 var genericOutputPort = (node) => {
   if (node.atomic) {
     return _.keys(_.pickBy(node.outputPorts, (type, name) => isGenericType(type)))
   } else {
     return _.keys(_.pickBy(_.merge({}, node.outputPorts, node.inputPorts), (type, name) => isGenericType(type)))
+  }
+}
+
+var typeRefOutputPort = (graph, node) => {
+  if (node.atomic) {
+    return _.keys(_.pickBy(node.outputPorts, (type, name) => isTypeRef(type) && !isActiveTypeRef(graph, type)))
+  } else {
+    return _.keys(_.pickBy(_.merge({}, node.outputPorts, node.inputPorts), (type, name) => isTypeRef(type) && !isActiveTypeRef(graph, type)))
   }
 }
 
@@ -116,4 +132,43 @@ export function functionReferences (graph, n) {
     .fromPairs()
     .value()
   return (_.keys(active).length === 0) ? false : active
+}
+
+export function typeRefInput (graph, n) {
+  const node = graph.node(n)
+
+  var typeRefPort = typeRefInputPort(graph, node)
+  if (typeRefPort.length === 0) {
+    return false
+  }
+  var predecessor = _(typeRefPort)
+    .map((p) => _.map(walk.predecessor(graph, n, p), (pred) => ({port: p, predecessor: pred})))
+    .flatten()
+    .filter((p) => !isGenericType(utils.portType(graph, p.predecessor.node, p.predecessor.port)) &&
+      !isTypeRef(utils.portType(graph, p.predecessor.node, p.predecessor.port)))
+    .first()
+  if (!predecessor) {
+    return false
+  }
+  return predecessor
+}
+
+export function typeRefOutput (graph, n) {
+  const node = graph.node(n)
+
+  var typeRefPort = typeRefOutputPort(graph, node)
+  if (typeRefPort.length === 0) {
+    return false
+  }
+  var successor = _(typeRefPort)
+    .map((p) => _.map(walk.successor(graph, n, p), (pred) => ({port: p, successor: pred})))
+    .flatten()
+    .compact()
+    .filter((p) => !isGenericType(utils.portType(graph, p.successor.node, p.successor.port)) &&
+      !isTypeRef(utils.portType(graph, p.successor.node, p.successor.port)))
+    .first()
+  if (!successor) {
+    return false
+  }
+  return successor
 }

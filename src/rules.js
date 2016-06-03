@@ -131,11 +131,47 @@ export const recursivePorts = rewrite.rule(
   }
 )
 
+const matchNonGenericRefNeighbor = (graph, node, match, matchType) => {
+  var curNode = graph.node(node)
+  var neigh = match[matchType]
+  var refType = utils.portType(graph, node, match.port)
+  var neighType = utils.portType(graph, neigh.node, neigh.port)
+  var refNode = graph.node(refType.node)
+  // references always point to compounds!! ??
+  if (refNode.atomic) {
+    // would be no big deal. Simply set the generic type.. but I assume it will not happen...
+    throw new Error('Cannot handle type reference to atomic node.')
+  }
+  if (!_.has(refNode, 'settings.genericType')) {
+    refNode.settings = _.merge({}, refNode.settings, {genericType: {}})
+  }
+  refNode.settings.genericType[refType.port] = entangleType(neighType, refType)
+  refNode.settings.isGeneric = true
+
+  if (!_.has(curNode, 'settings.genericType')) {
+    curNode.settings = _.merge({}, curNode.settings, {genericType: {}})
+  }
+  curNode.settings.genericType[match.port] = entangleType(neighType, refType)
+  curNode.settings.isGeneric = true
+}
+
+export const predecessorPropagatesRefType = rewrite.rule(
+  matchers.typeRefInput,
+  _.partial(matchNonGenericRefNeighbor, _, _, _, 'predecessor')
+)
+
+export const successorPropagatesRefType = rewrite.rule(
+  matchers.typeRefOutput,
+  _.partial(matchNonGenericRefNeighbor, _, _, _, 'successor')
+)
+
 export default [
   predecessorPropagatesType,
   successorPropagatesType,
   genericTypes,
   typeReferences,
   functionReferences,
-  recursivePorts
+  recursivePorts,
+  predecessorPropagatesRefType,
+  successorPropagatesRefType
 ]
