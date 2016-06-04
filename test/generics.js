@@ -26,7 +26,7 @@ describe('Determine generic types', () => {
     expect(genericNodes(replaced)).to.be.empty
   })
 
-  it.only('can process the quicksort example', () => {
+  it('can process the quicksort example', () => {
     var quickGraph = readFixture('fullGraphs/quicksort.json')
     var replaced = replaceGenerics(quickGraph)
     expect(genericNodes(replaced)).to.be.empty

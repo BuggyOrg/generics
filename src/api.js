@@ -10,8 +10,9 @@ function applyGenericRules (graph) {
   return {graph: newGraph, applied}
 }
 
-export function replaceGenerics (graph) {
-  for (var n = 0; n < graph.nodes().length * 20; n++) {
+export function replaceGenerics (graph, maxNum) {
+  maxNum = maxNum || graph.nodes().length * 20
+  for (var n = 0; n < maxNum; n++) {
     var res = applyGenericRules(graph)
     if (res.applied) {
       graph = res.graph

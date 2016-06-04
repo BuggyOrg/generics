@@ -100,7 +100,7 @@ export function genericType (graph, n) {
   const node = graph.node(n)
 
   // don't process non generics or already processed generics (isGeneric = true)
-  if (!node.settings || !node.settings.isGeneric) {
+  if (!node.settings || !node.settings.isGeneric || node.id === 'functional/lambda') {
     return false
   }
   // if all output ports were already assigned do not process this

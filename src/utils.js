@@ -59,6 +59,8 @@ export function entangleType (type, template) {
       return _.merge({}, type, {template})
     }
     return type.replace(/\[/g, '').replace(/\]/g, '')
+  } else if (template && isTypeRef(template) && template.template) {
+    return entangleType(type, template.template)
   } else {
     return type
   }
@@ -70,6 +72,8 @@ export function tangleType (type, template) {
       return _.merge({}, type, {template})
     }
     return '[' + type + ']'
+  } else if (template && isTypeRef(template) && template.template) {
+    return tangleType(type, template.template)
   } else {
     return type
   }

@@ -37,6 +37,24 @@ describe('Generic utility functions', () => {
     expect(utils.isActiveTypeRef(preGeneric, {type: 'type-ref', node: 'equal_0', port: 'i1'})).to.be.false
   })
 
+  describe('Type tangling', () => {
+    it('can tangle types', () => {
+      expect(utils.tangleType('number', 'generic')).to.equal('number')
+      expect(utils.tangleType('number', '[generic]')).to.equal('[number]')
+      expect(utils.tangleType('[number]', 'generic')).to.equal('[number]')
+      expect(utils.tangleType('number', {type: 'type-ref', template: 'generic'})).to.equal('number')
+      expect(utils.tangleType('number', {type: 'type-ref', template: '[generic]'})).to.equal('[number]')
+    })
+
+    it('can entangle types', () => {
+      expect(utils.entangleType('number', 'generic')).to.equal('number')
+      expect(utils.entangleType('[number]', 'generic')).to.equal('[number]')
+      expect(utils.entangleType('[number]', '[generic]')).to.equal('number')
+      expect(utils.entangleType('number', {type: 'type-ref', template: 'generic'})).to.equal('number')
+      expect(utils.entangleType('[number]', {type: 'type-ref', template: '[generic]'})).to.equal('number')
+    })
+  })
+
   it('detects active function references correctly', () => {
     var preGeneric = readFixture('preGeneric.json')
     expect(utils.isFunctionReference(preGeneric,
