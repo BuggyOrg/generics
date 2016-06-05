@@ -1,6 +1,6 @@
 {
   "name": "@buggyorg/generics",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Determines all generic types in a buggy graph.",
   "main": "lib/api.js",
   "scripts": {
