@@ -149,11 +149,16 @@ const matchNonGenericRefNeighbor = (graph, node, match, matchType) => {
   refNode.settings.genericType[refType.port] = entangleType(neighType, refType)
   refNode.settings.isGeneric = true
 
-  if (!_.has(curNode, 'settings.genericType')) {
-    curNode.settings = _.merge({}, curNode.settings, {genericType: {}})
+  if (curNode.atomic) {
+    curNode.settings = _.merge({}, curNode.settings, {genericType: entangleType(neighType, refType)})
+    curNode.settings.isGeneric = true
+  } else {
+    if (!_.has(curNode, 'settings.genericType')) {
+      curNode.settings = _.merge({}, curNode.settings, {genericType: {}})
+    }
+    curNode.settings.genericType[match.port] = entangleType(neighType, refType)
+    curNode.settings.isGeneric = true
   }
-  curNode.settings.genericType[match.port] = entangleType(neighType, refType)
-  curNode.settings.isGeneric = true
 }
 
 export const predecessorPropagatesRefType = rewrite.rule(

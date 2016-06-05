@@ -54,6 +54,9 @@ export function isActiveTypeRef (graph, type) {
 }
 
 export function entangleType (type, template) {
+  if (isTypeRef(type)) {
+    return _.merge({}, type, {template: (type.template) ? entangleType(type.template, template) : template})
+  }
   if (template && template[0] === '[' && template[template.length - 1] === ']') {
     if (typeof (type) === 'object' && type.type === 'type-ref') {
       return _.merge({}, type, {template})

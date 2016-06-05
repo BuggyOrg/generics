@@ -52,6 +52,7 @@ describe('Generic utility functions', () => {
       expect(utils.entangleType('[number]', '[generic]')).to.equal('number')
       expect(utils.entangleType('number', {type: 'type-ref', template: 'generic'})).to.equal('number')
       expect(utils.entangleType('[number]', {type: 'type-ref', template: '[generic]'})).to.equal('number')
+      expect(utils.entangleType({type: 'type-ref', template: '[generic]'}, '[generic]')).to.eql({type: 'type-ref', template: 'generic'})
     })
   })
 
