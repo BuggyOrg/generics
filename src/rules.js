@@ -71,6 +71,7 @@ function replaceFunctionTypeReferences (graph, functionType) {
   return {
     type: 'function',
     arguments: _.mapValues(functionType.arguments, resTypeRefs),
+    argumentOrdering: _.clone(functionType.argumentOrdering),
     outputs: _.mapValues(functionType.outputs, resTypeRefs),
     return: resTypeRefs(functionType.return)
   }
