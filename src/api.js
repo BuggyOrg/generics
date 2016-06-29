@@ -1,11 +1,11 @@
 
-import {utils} from '@buggyorg/graphtools'
+import {graph as graphAPI} from '@buggyorg/graphtools'
 import {isGenericFree, genericNodes} from './utils.js'
 import rules from './rules'
 import _ from 'lodash'
 
 function applyGenericRules (graph) {
-  var newGraph = utils.clone(graph)
+  var newGraph = graphAPI.clone(graph)
   var applied = _.reduce(rules, (acc, f) => f(newGraph) || acc, false)
   return {graph: newGraph, applied}
 }
